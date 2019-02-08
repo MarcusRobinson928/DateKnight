@@ -1,0 +1,58 @@
+.App {
+    background-image: url('kilyan-sockalingum-478724-unsplash.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.App-header {
+    color: white;
+    font-family: 'Playfair Display SC', serif;
+    text-align: center;
+    padding: 50px 
+}
+
+.home {
+    font-family: 'Roboto', sans-serif;
+}
+
+.home:hover {
+    box-shadow: 0 0 2px 1px rgba(253, 0, 0, 0.911);
+    color: white;
+}
+
+h2 {
+    font-family: 'Roboto', sans-serif;
+    font-size: 80px
+}
+
+h3, p {
+    font-family: 'Roboto', sans-serif;
+    color: white;
+}
+
+i:hover {
+    box-shadow: 0 0 2px 1px rgba(253, 0, 0, 0.911);
+}
+
+img {
+    width: 300px;
+    height: 150px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+button:hover {
+    box-shadow: 0 0 2px 1px rgba(253, 0, 0, 0.911);
+}
+
+.results.ui.card {
+    background-color: rgb(241, 241, 241)
+}
+
+.music, .dinner, .movie, .theater, .sports {
+    font-size: 40px;
+    color: white;
+    background: none;
+    border: none
+}
+
