@@ -3,12 +3,12 @@ import * as axios from 'axios'
 import $  from 'jquery'
 import moment from 'moment'
 import { Grid } from 'semantic-ui-react'
-import yelp from 'yelp-fusion'
 import DateType from './DateType'
 import ResultPage from './ResultPage'
 import MoviePage from './movieResults'
 import PlacesResults from './PlacesResults'
 import WeatherResults from './WeatherResults'
+import RestaurantsResults from './RestaurantsResults'
 
 class HomePage extends Component {
 
@@ -19,7 +19,7 @@ class HomePage extends Component {
     dateSelectionResults: [],
     userHistory: [],
     musicChoices: [],
-    dinnerChoices: [],
+    restaurantsChoices: [],
     movieChoices: [],
     movieID: [],
     movieTrailerKey: [],
@@ -90,7 +90,7 @@ class HomePage extends Component {
           this.isMusic();
             this.isTheater();
               this.isSports();
-                this.getYelp();
+                this.getRestaurants();
                   this.getTrailerKey()
                     this.getPlaces()
       });
@@ -128,28 +128,10 @@ class HomePage extends Component {
     };
   };
 
-  getYelp = () => {
-    let cachedLocation = this.state.city
-    let currentOffset = 0
-         const client = yelp.client(`${process.env.YELP_API}`);
-          axios.get(`/api/restaurant/${this.state.city}/`, function (req, res) {
-            if (cachedLocation !== this.state.city) {
-                currentOffset = 0;
-            }
-            client.search({ 
-            term:'food',
-            location: req.params.location,
-            limit: 10,
-            offset: currentOffset * 10
-            }).then(response => {
-            console.log(response)
-            }).catch(e => {
-            res.json(e);
-            });
-    
-            currentOffset++;
-            cachedLocation = req.params.location;
-    }); 
+  getRestaurants = () => {
+    let city = this.state.city
+    axios.get(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${city}+restaurant&maxprice=3&radius=40233&language=en&key=AIzaSyBDsOr5y8ZuU83bfX_Ju2VlKUxbz65Ash8`)
+    .then(results => this.setState({restaurantsChoices: results.data.results}))
   };
 
   getPlaces = () => {
@@ -217,7 +199,7 @@ class HomePage extends Component {
                 </Grid.Column>
                   <Grid.Column>
                     <h3>Restaurants</h3>
-                    <ResultPage results={this.state.dinnerChoices}/>
+                    <RestaurantsResults results={this.state.restaurantsChoices}/>
                   </Grid.Column>
                     <Grid.Column>
                       <h3>Movies</h3>
