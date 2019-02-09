@@ -112,15 +112,15 @@ class HomePage extends Component {
   }
 
   getWeatherKey = () => {
-    axios.get(`https://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey=1gAziFvZ0LGxbqOnl1X6GxBww1jHxQAa&q=${this.state.latitude},${this.state.longitude}`)
+    axios.get(`https://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey=193rmwBf0ZNHQj7p7PmYRqnZbxbkKnJM&q=${this.state.latitude},${this.state.longitude}`)
     .then(result =>  
-      axios.get(`https://dataservice.accuweather.com/currentconditions/v1/${result.data.Key}?apikey=1gAziFvZ0LGxbqOnl1X6GxBww1jHxQAa&language=en-us&details=false`))
+      axios.get(`https://dataservice.accuweather.com/currentconditions/v1/${result.data.Key}?apikey=193rmwBf0ZNHQj7p7PmYRqnZbxbkKnJM&language=en-us&details=false`))
       .then(current => 
         this.setState({weatherTemp: current.data[0].Temperature.Imperial.Value}, this.setState({weatherText: current.data[0].WeatherText})));
   };
 
   getCity = () => {
-    axios.get(`https://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey=1gAziFvZ0LGxbqOnl1X6GxBww1jHxQAa&q=${this.state.latitude},${this.state.longitude}`)
+    axios.get(`https://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey=193rmwBf0ZNHQj7p7PmYRqnZbxbkKnJM&q=${this.state.latitude},${this.state.longitude}`)
     .then(city => 
       this.setState({city: city.data.ParentCity.LocalizedName}));
   };
