@@ -7,8 +7,6 @@ const Schema = mongoose.Schema;
 const dateSelectionsSchema = new Schema({
   dateSelections: {
     music: String,
-    dinner: String,
-    movie: String,
     theater: String,
     sports: String,
   }

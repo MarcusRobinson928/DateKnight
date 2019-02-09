@@ -18,7 +18,7 @@ const MoviePage = (props) => (
                             </div>
                 </div>
                             <div className="extra content">
-                                <button className="user icon" onClick={() => window.open('https://www.youtube.com/watch?v=' + rest)}>
+                                <button className="user icon" onClick={() => window.open('https://www.youtube.com/watch?v=' + props.trailer[i])}>
                                     Trailer 
                                 </button>
                             </div>
