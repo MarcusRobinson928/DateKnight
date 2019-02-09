@@ -3,24 +3,17 @@ import * as axios from 'axios'
 import $  from 'jquery'
 import moment from 'moment'
 import { Grid } from 'semantic-ui-react'
+import yelp from 'yelp-fusion'
 import DateType from './DateType'
 import ResultPage from './ResultPage'
 import MoviePage from './movieResults'
+import PlacesResults from './PlacesResults'
 import WeatherResults from './WeatherResults'
-
-const yelpConfig = {
-  headers: {'Authorization': 'Bearer EXQwlZajZpkMHBMv9IEXQE07U_-N1uiKKtA047sgmrHb3ZlHvD6O5-xrVrpINtC-hMC6NHIELlVUa4yCY2NhX8aZjkevymrswP1tTtwgko4BF0YGSDWe49kSJItMXHYx'},
-  params: {
-    term: 'tacos'
-  }
-};
 
 class HomePage extends Component {
 
   state = {
     music: false,
-    dinner: false,
-    movie: false,
     theater: false,
     sports: false,
     dateSelectionResults: [],
@@ -33,6 +26,7 @@ class HomePage extends Component {
     movieTrailer: [],
     theaterChoices: [],
     sportsChoices: [],
+    places: [],
     date: '',
     latitude: '',
     longitude: '',
@@ -66,13 +60,13 @@ class HomePage extends Component {
   // Function to save latitude and longitude from Geolocation
   saveLocation = (position) => {
     this.setState({latitude: position.coords.latitude});
-      this.setState({longitude: position.coords.longitude});  
+      this.setState({longitude: position.coords.longitude});
+      this.getCity();  
   };
   
   // Function to take users selections and save them 
   selectedEvent = (event) => {
     let eventSelect = event.target.name
-    console.log(eventSelect)
     this.setState({[eventSelect]: !this.state[eventSelect]});
     $(`.${eventSelect}`).css({'color': '#1DFF4E', 'display': 'block'});
   };
@@ -84,6 +78,7 @@ class HomePage extends Component {
       $(document.getElementsByClassName('selections')).css('display', 'none'),
         this.getDateSelectionResults(),
           this.getWeatherKey(),
+              this.isMovie()
     );
   };
 
@@ -92,12 +87,13 @@ class HomePage extends Component {
     axios.get('/results')
     .then((result) => {
       this.setState({dateSelectionResults: result.data.dateSelections});
-        this.isMusic();
-          this.isTheater();
-            this.isSports();
-              this.getYelp()
-                this.isMovie();
-    });
+          this.isMusic();
+            this.isTheater();
+              this.isSports();
+                this.getYelp();
+                  this.getTrailerKey()
+                    this.getPlaces()
+      });
   };
 
   // Function the get user selection history from the database
@@ -106,21 +102,20 @@ class HomePage extends Component {
     .then((results) => {
       let data = results.data.slice(1).slice(-5)
       let history = data.map((results) => results.dateSelections)
-        console.log(history)
         this.setState({userHistory: history})
     })
   }
 
   getWeatherKey = () => {
-    axios.get(`http://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey=oiBcO3lzjAme6dQSmgDI6OFGQZ6GfZAI&q=${this.state.latitude},${this.state.longitude}`)
+    axios.get(`http://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey=1gAziFvZ0LGxbqOnl1X6GxBww1jHxQAa&q=${this.state.latitude},${this.state.longitude}`)
     .then(result =>  
-      axios.get(`http://dataservice.accuweather.com/currentconditions/v1/${result.data.Key}?apikey=oiBcO3lzjAme6dQSmgDI6OFGQZ6GfZAI&language=en-us&details=false`))
+      axios.get(`http://dataservice.accuweather.com/currentconditions/v1/${result.data.Key}?apikey=1gAziFvZ0LGxbqOnl1X6GxBww1jHxQAa&language=en-us&details=false`))
       .then(current => 
         this.setState({weatherTemp: current.data[0].Temperature.Imperial.Value}, this.setState({weatherText: current.data[0].WeatherText})));
   };
 
   getCity = () => {
-    axios.get(`http://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey=oiBcO3lzjAme6dQSmgDI6OFGQZ6GfZAI&q=${this.state.latitude},${this.state.longitude}`)
+    axios.get(`http://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey=1gAziFvZ0LGxbqOnl1X6GxBww1jHxQAa&q=${this.state.latitude},${this.state.longitude}`)
     .then(city => 
       this.setState({city: city.data.ParentCity.LocalizedName}));
   };
@@ -134,12 +129,34 @@ class HomePage extends Component {
   };
 
   getYelp = () => {
-    axios.get('https://api.yelp.com/v3/businesses/search', yelpConfig)
-    .then(response => console.log(response))
-      .catch((err) => {
-        console.log(err)
-      })
+    let cachedLocation = this.state.city
+    let currentOffset = 0
+         const client = yelp.client(`${process.env.YELP_API}`);
+          axios.get(`/api/restaurant/${this.state.city}/`, function (req, res) {
+            if (cachedLocation !== this.state.city) {
+                currentOffset = 0;
+            }
+            client.search({ 
+            term:'food',
+            location: req.params.location,
+            limit: 10,
+            offset: currentOffset * 10
+            }).then(response => {
+            console.log(response)
+            }).catch(e => {
+            res.json(e);
+            });
+    
+            currentOffset++;
+            cachedLocation = req.params.location;
+    }); 
   };
+
+  getPlaces = () => {
+    let city = this.state.city
+    axios.get(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${city}+point+of+interest&radius=40233&language=en&key=AIzaSyBDsOr5y8ZuU83bfX_Ju2VlKUxbz65Ash8`)
+    .then(results => this.setState({places: results.data.results}))
+  }
 
   isMovie = () => {
     axios.get(`https://api.themoviedb.org/3/movie/now_playing?api_key=b3268089e09ea14487266d14235b7164&language=en-US&page=1&region=us&adult=false`)
@@ -149,20 +166,17 @@ class HomePage extends Component {
   };
 
   getTrailerKey = () => {
+    var key = []
     for(let i = 0; i < this.state.movieID.length; i++){
-      let id = this.state.movieID[i]
+      var id = this.state.movieID[i]
         axios.get(`https://api.themoviedb.org/3/movie/${id}/videos?api_key=b3268089e09ea14487266d14235b7164&language=en-US`)
         .then(results =>
-          console.log(results.data.results[0].key));
-    };
+          {
+            if(results.data.results[0] !== undefined){key.push(results.data.results[0].key)}
+          this.setState({movieTrailerKey: key})}
+        );
   };
-
-  getTrailer = () => {
-    let key = this.state.movieTrailerKey
-    axios.get(`https://www.youtube.com/watch?v=${key}`)
-    .then(results => 
-      this.setState({movieTrailer: results.data}))
-  }
+};
 
   isTheater = () => {
     if(this.state.theater === true){
@@ -202,16 +216,16 @@ class HomePage extends Component {
                   <ResultPage results={this.state.sportsChoices}/>
                 </Grid.Column>
                   <Grid.Column>
-                    <h3>Resturants</h3>
+                    <h3>Restaurants</h3>
                     <ResultPage results={this.state.dinnerChoices}/>
                   </Grid.Column>
                     <Grid.Column>
                       <h3>Movies</h3>
-                      <MoviePage results={this.state.movieChoices} />
+                      <MoviePage results={this.state.movieChoices} trailer={this.state.movieTrailerKey}/>
                     </Grid.Column>
                       <Grid.Column>
                         <h3>Sights</h3>
-                        <ResultPage results={this.state.dinnerChoices}/>
+                        <PlacesResults results={this.state.places}/>
                       </Grid.Column>
                 </Grid.Row>
               </Grid>
