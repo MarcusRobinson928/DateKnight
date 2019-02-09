@@ -6,7 +6,7 @@ const WeatherResults = (props) => (
         <div className="ui card">
             <div className="content">
                 <div className="header">
-                    {props.city}
+                    <h4>{props.city}</h4>
                 </div>
             </div>
                 <div className="content">

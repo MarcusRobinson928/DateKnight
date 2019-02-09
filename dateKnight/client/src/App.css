@@ -2,13 +2,16 @@
     background-image: url('kilyan-sockalingum-478724-unsplash.jpg');
     background-repeat: no-repeat;
     background-size: cover;
+    height: auto;
 }
 
-.App-header {
+h1 {
     color: white;
     font-family: 'Playfair Display SC', serif;
     text-align: center;
-    padding: 50px 
+    padding-top: 50px;
+    margin-right: 80px;
+    font-size: 50px;
 }
 
 .home {
@@ -28,6 +31,14 @@ h2 {
 h3, p {
     font-family: 'Roboto', sans-serif;
     color: white;
+    text-align: center;
+    margin-right: 100px;
+}
+
+h4 {
+    font-family: 'Roboto', sans-serif;
+    color: black;
+    font-size: 30px;
 }
 
 i:hover {
