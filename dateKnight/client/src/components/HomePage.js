@@ -39,7 +39,12 @@ class HomePage extends Component {
     this.getGeoLocation();
       this.getDate();
         this.getHistory();
+          this.handleChange();
   };
+
+  handleChange = () => {
+    $('.weather').css({'visibility': 'hidden'})
+  }
 
   // Function to reload Home Page
   resetHome = () => {
@@ -184,11 +189,15 @@ class HomePage extends Component {
           handleSubmit={this.handleSubmit}
           history={this.state.userHistory}
         />
+        <br></br>
+        <br></br>
           <WeatherResults 
             city={this.state.city} 
             currentTemp={this.state.weatherTemp} 
             currentText={this.state.weatherText}
           />
+          <br></br>
+          <br></br>
             <Grid columns={4} divided>
               <Grid.Row>
                 <Grid.Column>
